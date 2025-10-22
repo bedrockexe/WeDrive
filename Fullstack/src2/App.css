@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 * {
 	margin: 0;
 	padding: 0;
@@ -10,9 +12,12 @@ body {
 	height: 100vh;
 	width: 100vw;
 	background: linear-gradient(135deg, #adf0bb 0%, #e3ffe7 100%);
-	justify-content: center;
+	background-image: url(public/carmage.jpg);
+	justify-content: flex-end;
 	align-items: center;
 	overflow: hidden;
+	background-repeat: no-repeat;
+	background-size: 70% 100vh;
 }
 
 #root {
@@ -27,8 +32,8 @@ body {
 	height: 100%;
 }
 
-#img-side img {
-	width: 120%;
+#img {
+	width: 50%;
 	height: 100%;
 	object-fit: cover;
 	display: block;
@@ -41,7 +46,7 @@ body {
 	left: 0;
 	width: 120%;
 	height: 100%;
-	background: linear-gradient(315deg, #2e7d324e, #4caf4f66);
+	background: linear-gradient(-90deg, rgba(46, 125, 50, 0.25), rgba(83, 152, 83, 0.6));
 	z-index: 1;
 }
 
@@ -57,6 +62,12 @@ body {
 	padding: 2rem;
 	color: white;
 	z-index: 3;
+}
+
+.img-text img{
+	height: 50px;
+	width: 50px;
+	margin: 0 1rem 0 0;
 }
 
 .img-text h1 {
@@ -149,12 +160,11 @@ body {
 	font-weight: 600;
 	color: #2e7d32;
 	text-align: left;
-	margin-bottom: 2rem;
+	margin-bottom: 0.5rem;
 }
 
 .input-control {
 	width: 100%;
-	margin-bottom: 0.5rem;
 }
 
 .input-control label {
@@ -170,8 +180,14 @@ body {
 	border: 2px solid #a5d6a7;
 	border-radius: 8px;
 	outline: none;
-	transition: border-color 0.3s;
+	transition: 0.3s;
 	font-size: 1rem;
+}
+
+
+.input-control input::placeholder{
+	opacity: 0.5;
+	color: #2e7d32;
 }
 
 .input-control input:focus {
@@ -182,7 +198,7 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	margin: 1rem 0 0 0;
+	margin: 0.3rem 0 0 0;
 	color: #2e7d32;
 }
 

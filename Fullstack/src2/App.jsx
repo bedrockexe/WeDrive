@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-
-
 function App() {
   const [isRegister, setIsRegister] = useState(false);
 
@@ -138,10 +136,9 @@ function App() {
   return (
     <>
       <div id="img-side">
-        <img src="public/carmage.jpg" alt="Login Image" />
-
         <div className="overlay-content">
           <div className="img-text">
+            <img src="./public/WEDRIVE.png" alt="" />
             <h1>WeDrive</h1>
           </div>
           <div className="img-text">
