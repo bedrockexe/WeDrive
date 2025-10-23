@@ -10,7 +10,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 
 const formSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.email('Please enter a valid email address'),
   password: z.string().min(1, 'Password is required'),
 });
 
@@ -42,6 +42,7 @@ const LoginForm = () => {
         alert('Login failed. Please try again.');
     }
   }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <FormField

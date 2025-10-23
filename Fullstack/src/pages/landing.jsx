@@ -1,25 +1,21 @@
-import { Header } from './components/Landing/Header';
-import { HeroSection } from './components/Landing/HeroSection';
-import { FeaturedCars } from './components/Landing/FeaturedCars';
-import { WhyChooseUs } from './components/Landing/WhyChooseUs';
-import { HowItWorks } from './components/Landing/HowItWorks';
-import { Testimonials } from './components/Landing/Testimonials';
-import { FAQ } from './components/Landing/FAQ';
-import { Footer } from './components/Landing/Footer';
+import Navbar from "./components/Landing/Navbar"
+import Hero from "./components/Landing/Hero"
+import Services from "./components/Landing/Services"
+import Explore from "./components/Landing/Explore"
+import FAQ from "./components/Landing/FAQ"
+import Footer from "./components/Landing/Footer"
 
-function LandingPage() {
-  return <div className="flex flex-col min-h-screen w-full">
-    <Header />
-      <main>
-        <HeroSection />
-        <FeaturedCars />
-        <WhyChooseUs />
-        <HowItWorks />
-        <Testimonials />
+function Landing() {
+  return (
+    <div className="w-full">
+      <Navbar />
+        <Hero />
+        <Services />
+        <Explore />
         <FAQ />
-      </main>
-    <Footer />
-  </div>;
+      <Footer />
+    </div>
+  )
 }
 
-export default LandingPage;
+export default Landing

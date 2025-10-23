@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Landing from "./pages/landing";
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
+// import Register from "./pages/Register";
 import DashboardLayout from "./pages/Dashboard";
 
 export default function App() {
@@ -11,7 +11,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/register" element={<Register />} /> */}
           <Route path="/dashboard" element={<DashboardLayout />} />
         </Routes>
       </div>
