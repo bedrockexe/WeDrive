@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #ffc107;
+  --primary-dark: #d4a20e;
+  --primary-light: #ffeb3b;
+  --success: #4caf50;
+  --text-dark: #1a1a1a;
+  --text-light: #555555;
+  --border: #e0e0e0;
+  --bg-light: #f5f5f5;
+  --bg-header: #c8e6c9;
+  --white: #ffffff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.5;
+ /* Added touch-action optimization for better mobile interaction */
+  touch-action: manipulation;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  /* Better mobile button interaction */
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  /* Better mobile tap target */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improved font scaling for better readability on mobile */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+
+  body {
+    line-height: 1.5;
+  }
+}
+
+/* Added viewport and accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Input optimization for mobile */
+input,
+textarea,
+select {
+  font-size: 16px;
+  padding: 12px;
+}
+
+/* Better visibility for focus states on mobile */
+@media (hover: none) and (pointer: coarse) {
+  button:focus,
+  a:focus,
+  input:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
