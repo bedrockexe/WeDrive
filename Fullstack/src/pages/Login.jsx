@@ -1,388 +1,367 @@
 import { useEffect, useState } from "react";
-import "./Login.css";
-import axios from "axios";
-import { useNavigate } from "react-router-dom"; // <- fixed
-// removed unused 'z' import
 
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const PHONE_REGEX = /^\d{11}$/;
-const PASSWORD_MIN = 8;
-
-function Login() {
+function App() {
   const [isRegister, setIsRegister] = useState(false);
 
-  // login form state
-  const [login, setLogin] = useState({ email: "", password: "" });
-  const [loginErrors, setLoginErrors] = useState({});
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [loginServerError, setLoginServerError] = useState("");
-  const navigate = useNavigate();
+  useEffect(() => {
+    const login = document.getElementById("login");
+    const email_log = document.getElementById("email_log");
+    const password_log = document.getElementById("password_log");
+    const signup = document.getElementById("signup");
+    const fname = document.getElementById("fname");
+    const lname = document.getElementById("lname");
+    const tel = document.getElementById("tel");
+    const email_sig = document.getElementById("email_sig");
+    const password_sig = document.getElementById("password_sig");
 
-  // signup form state
-  const [signup, setSignup] = useState({
-    fname: "",
-    lname: "",
-    tel: "",
-    email: "",
-    password: "",
-  });
-  const [signupErrors, setSignupErrors] = useState({});
-  const [signupLoading, setSignupLoading] = useState(false);
-  const [signupServerError, setSignupServerError] = useState("");
+    const setError = (element, message) => {
+      const inputControl = element.parentElement;
+      const errorDisplay = inputControl.querySelector(".error");
+      if (errorDisplay) errorDisplay.innerText = message;
+      inputControl.classList.add("error");
+      inputControl.classList.remove("success");
+    };
 
-  // show password toggle
-  const [showPassword, setShowPassword] = useState(false);
+    const setSuccess = (element) => {
+      const inputControl = element.parentElement;
+      const errorDisplay = inputControl.querySelector(".error");
+      if (errorDisplay) errorDisplay.innerText = "";
+      inputControl.classList.add("success");
+      inputControl.classList.remove("error");
+    };
 
-  // simple validate functions returning an object of errors
-  const validateLogin = (values) => {
-    const errs = {};
-    const email = (values.email || "").trim();
-    const pw = (values.password || "").trim();
+    const isValidEmail = (email) =>
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
+        String(email).toLowerCase()
+      );
 
-    if (!email) errs.email = "Email is required";
-    else if (!EMAIL_REGEX.test(email)) errs.email = "Enter a valid email address";
+    const validateSignupInputs = () => {
+      const fnameValue = fname.value.trim();
+      const lnameValue = lname.value.trim();
+      const telValue = tel.value.trim();
+      const emailValue = email_sig.value.trim();
+      const passwordValue = password_sig.value.trim();
+      let isValid = true;
 
-    if (!pw) errs.password = "Password is required";
-    return errs;
-  };
+      if (!fnameValue) {
+        setError(fname, "First name is required");
+        isValid = false;
+      } else setSuccess(fname);
 
-  const validateSignup = (values) => {
-    const errs = {};
-    const fname = values.fname.trim();
-    const lname = values.lname.trim();
-    const tel = values.tel.trim();
-    const email = values.email.trim();
-    const pw = values.password.trim();
+      if (!lnameValue) {
+        setError(lname, "Last name is required");
+        isValid = false;
+      } else setSuccess(lname);
 
-    if (!fname) errs.fname = "First name is required";
-    if (!lname) errs.lname = "Last name is required";
+      if (!telValue) {
+        setError(tel, "Phone number is required");
+        isValid = false;
+      } else if (!/^\d+$/.test(telValue)) {
+        setError(tel, "Phone number must contain only digits");
+        isValid = false;
+      } else if (telValue.length !== 11) {
+        setError(tel, "Phone number must be exactly 11 digits");
+        isValid = false;
+      } else setSuccess(tel);
 
-    if (!tel) errs.tel = "Phone number is required";
-    else if (!/^\d+$/.test(tel)) errs.tel = "Phone number must contain only digits";
-    else if (!PHONE_REGEX.test(tel)) errs.tel = "Phone number must be exactly 11 digits";
+      if (!emailValue) {
+        setError(email_sig, "Email is required");
+        isValid = false;
+      } else if (!isValidEmail(emailValue)) {
+        setError(email_sig, "Provide a valid email address");
+        isValid = false;
+      } else setSuccess(email_sig);
 
-    if (!email) errs.email = "Email is required";
-    else if (!EMAIL_REGEX.test(email)) errs.email = "Provide a valid email address";
+      if (!passwordValue) {
+        setError(password_sig, "Password is required");
+        isValid = false;
+      } else if (passwordValue.length < 8) {
+        setError(password_sig, "Password must be at least 8 characters");
+        isValid = false;
+      } else setSuccess(password_sig);
 
-    if (!pw) errs.password = "Password is required";
-    else if (pw.length < PASSWORD_MIN) errs.password = `Password must be at least ${PASSWORD_MIN} characters`;
+      return isValid;
+    };
 
-    return errs;
-  };
+    const validateLoginInputs = () => {
+      const emailValue = email_log.value.trim();
+      const passwordValue = password_log.value.trim();
+      let isValid = true;
 
-  // Generic handler to set form fields
-  const handleChange = (setter) => (e) => {
-    const { name, value } = e.target;
-    setter((prev) => ({ ...prev, [name]: value }));
-  };
+      if (!emailValue) {
+        setError(email_log, "Email is required");
+        isValid = false;
+      } else if (!isValidEmail(emailValue)) {
+        setError(email_log, "Enter a valid email address");
+        isValid = false;
+      } else setSuccess(email_log);
 
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault(); // prevent page reload
-    setLoginServerError("");
-    const errs = validateLogin(login);
-    setLoginErrors(errs);
-    if (Object.keys(errs).length > 0) return;
+      if (!passwordValue) {
+        setError(password_log, "Password is required");
+        isValid = false;
+      } else setSuccess(password_log);
 
-    setLoginLoading(true);
-    try {
-      const data = {
-        email: login.email.trim(),
-        password: login.password,
-      };
+      return isValid;
+    };
 
-      // Example: if backend is on different host/port, make sure it's accessible,
-      // or use a proxy in dev (create-react-app) so you can do /api/login
-      const response = await axios.post("http://localhost:5000/login", data);
-
-      const { token, user } = response.data;
-      if (!token) {
-        setLoginServerError(response.data?.message || "Login failed");
-        return;
-      }
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      // navigate after storing token
-      navigate("/dashboard");
-    } catch (err) {
-      // try to read server message if available
-      const serverMsg =
-        err?.response?.data?.message || err?.response?.data || err.message;
-      setLoginServerError(serverMsg || "Network error. Try again.");
-    } finally {
-      setLoginLoading(false);
-    }
-  };
-
-  const handleSignupSubmit = async (e) => {
-    e.preventDefault();
-    setSignupServerError("");
-    const errs = validateSignup(signup);
-    setSignupErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
-    setSignupLoading(true);
-    try {
-      const payload = {
-        firstName: signup.fname.trim(),
-        lastName: signup.lname.trim(),
-        phone: signup.tel.trim(),
-        email: signup.email.trim(),
-        password: signup.password,
-      };
-
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+    if (signup) {
+      signup.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (validateSignupInputs()) console.log("Signup success");
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setSignupServerError(data?.message || "Registration failed");
-      } else {
-        console.log("signup success", data);
-        // optionally auto-login or switch to login view
-        setIsRegister(false);
-        // optionally prefill login email
-        setLogin((l) => ({ ...l, email: signup.email }));
-        // clear signup form
-        setSignup({ fname: "", lname: "", tel: "", email: "", password: "" });
-      }
-    } catch (err) {
-      setSignupServerError("Network error. Try again.");
-    } finally {
-      setSignupLoading(false);
     }
-  };
 
-  useEffect(() => {
-    setLoginServerError("");
-  }, [login.email, login.password]);
-
-  useEffect(() => {
-    setSignupServerError("");
-  }, [signup.fname, signup.lname, signup.tel, signup.email, signup.password]);
+    if (login) {
+      login.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (validateLoginInputs()) console.log("Login success");
+      });
+    }
+  }, []);
 
   return (
-    <div className="login-container">
-      <div id="img-side">
-        <div className="overlay-content">
-          <div className="img-text">
-            <img src="/WEDRIVE.png" alt="WeDrive logo" /> {/* prefer /WEDRIVE.png from public */}
-            <h1>WeDrive</h1>
+    <div className="flex h-screen w-screen overflow-hidden bg-gradient-to-br from-green-200 via-emerald-100 to-green-50 relative animate-fadeIn">
+      {/* Left image side */}
+      <div className="relative flex-1 h-full bg-[url('/public/carmage.jpg')] bg-no-repeat bg-cover bg-right animate-slowZoom">
+        <div className="absolute inset-0 bg-gradient-to-l from-green-900/70 to-green-700/30 backdrop-blur-sm"></div>
+
+        <div className="absolute inset-0 flex flex-col justify-between p-10 text-white z-10">
+          <div className="flex items-center space-x-4">
+            <img
+              src="./public/WEDRIVE.png"
+              alt="WeDrive Logo"
+              className="w-16 h-16 drop-shadow-xl animate-float"
+            />
+            <h1 className="text-6xl font-extrabold tracking-wider drop-shadow-2xl">
+              WeDrive
+            </h1>
           </div>
-          <div className="img-text">
-            <p className="tagline">“You say, we drive”</p>
-          </div>
+
+          <p className="italic text-3xl text-emerald-100 drop-shadow-lg animate-fadeInDelay">
+            “You say, we drive”
+          </p>
         </div>
       </div>
 
-      <div id="log-reg" className={isRegister ? "show-register" : ""}>
-        <div id="log">
-          <form id="login" onSubmit={handleLoginSubmit}>
-            <h2 className="ls-label">Login</h2>
+      {/* Right login/register side */}
+      <div
+        id="log-reg"
+        className={`relative flex flex-col items-center justify-center bg-white/80 backdrop-blur-lg border-l border-green-200 h-full w-1/2 px-12 py-10 
+          shadow-2xl transition-all duration-700 ease-in-out transform ${
+            isRegister ? "bg-emerald-50/80" : ""
+          }`}
+      >
+        {/* LOGIN FORM */}
+        <div
+          id="log"
+          className={`w-full max-w-md transition-all duration-700 ${
+            isRegister
+              ? "-translate-y-full opacity-0"
+              : "translate-y-0 opacity-100"
+          }`}
+        >
+          <form
+            id="login"
+            method="POST"
+            className="flex flex-col gap-5 bg-white/70 p-8 rounded-3xl shadow-lg backdrop-blur-md hover:shadow-emerald-200/50 transition"
+          >
+            <h2 className="text-3xl font-bold text-green-700 mb-3 text-center">
+              Welcome Back
+            </h2>
 
-            <div className={`input-control ${loginErrors.email ? "error" : login.email ? "success" : ""}`}>
-              <label htmlFor="email_log">Email</label>
+            <div className="flex flex-col">
+              <label
+                htmlFor="email_log"
+                className="font-medium text-green-700"
+              >
+                Email
+              </label>
               <input
                 type="email"
                 id="email_log"
                 name="email"
                 placeholder="Enter Email"
-                value={login.email}
-                onChange={handleChange(setLogin)}
-                required
-                aria-invalid={!!loginErrors.email}
-                aria-describedby="email_log_error"
+                className="border-2 border-green-300 rounded-md px-4 py-2 focus:outline-none focus:border-green-600 focus:shadow-md transition placeholder-green-700/50"
               />
-              <div id="email_log_error" className="error" aria-live="polite">
-                {loginErrors.email}
-              </div>
+              <span className="error text-red-500 text-sm mt-1"></span>
             </div>
 
-            <div className={`input-control ${loginErrors.password ? "error" : login.password ? "success" : ""}`}>
-              <label htmlFor="password_log">Password</label>
+            <div className="flex flex-col">
+              <label
+                htmlFor="password_log"
+                className="font-medium text-green-700"
+              >
+                Password
+              </label>
               <input
-                type={showPassword ? "text" : "password"}
+                type="password"
                 id="password_log"
                 name="password"
                 placeholder="Enter Password"
-                value={login.password}
-                onChange={handleChange(setLogin)}
-                required
-                aria-invalid={!!loginErrors.password}
-                aria-describedby="password_log_error"
+                className="border-2 border-green-300 rounded-md px-4 py-2 focus:outline-none focus:border-green-600 focus:shadow-md transition placeholder-green-700/50"
               />
-              <div id="password_log_error" className="error" aria-live="polite">
-                {loginErrors.password}
-              </div>
+              <span className="error text-red-500 text-sm mt-1"></span>
             </div>
 
-            <div className="checkbox">
-              <input
-                type="checkbox"
-                id="show-password"
-                checked={showPassword}
-                onChange={() => setShowPassword((s) => !s)}
-              />
-              <label htmlFor="show-password">Show Password</label>
+            <div className="flex items-center gap-2 text-green-700"> 
+              <input 
+              type="checkbox" 
+              id="show-password" 
+              className="w-4 h-4 accent-green-600" /> 
+              <label htmlFor="show-password" className="text-green-700 font-small"> Show Password </label> 
             </div>
 
-            <div className="switch">
-              <input
-                type="checkbox"
-                id="chk"
-                aria-hidden="true"
-                checked={isRegister}
-                onChange={() => setIsRegister((s) => !s)}
-              />
-              <label htmlFor="chk" aria-hidden="true" className="sign_up-link">
-                Don't have an account? Sign-up!
-              </label>
-            </div>
-
-            <button type="submit" disabled={loginLoading}>
-              {loginLoading ? "Logging in..." : "Login"}
+            <button
+              type="submit"
+              className="w-full py-3 rounded-md font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-400 hover:scale-105 hover:shadow-xl transition-all duration-300"
+            >
+              Login
             </button>
 
-            {loginServerError && <div className="server-error" role="alert">{loginServerError}</div>}
-
-            <div className="or_part">
-              <hr />
-              <h3>or</h3>
-              <hr />
+            <div className="flex items-center justify-center gap-2">
+              <hr className="w-32 border border-green-600" />
+              <h3 className="text-green-700">or</h3>
+              <hr className="w-32 border border-green-600" />
             </div>
 
-            <div className="google_btn">
-              <i className="fa-brands fa-google"></i>
-              <label>Login with your Google</label>
-            </div>
+            <button
+              type="button"
+              className="w-full flex items-center justify-center py-3 border border-green-700 text-green-700 rounded-md hover:bg-gradient-to-r hover:from-green-700 hover:to-green-500 hover:text-white transition"
+            >
+              <i className="fa-brands fa-google mr-2"></i> Login with Google
+            </button>
+
+            <div className="text-center text-green-700">
+            <label
+              htmlFor="chk"
+              className="cursor-pointer hover:text-green-900 hover:underline transition"
+              onClick={() => setIsRegister(true)}
+            >
+              Don’t have an account? Sign up!
+            </label>
+          </div>
           </form>
         </div>
 
-        <div id="reg">
-          <form id="signup" onSubmit={handleSignupSubmit}>
-            <h2 className="ls-label">Sign Up</h2>
+        {/* REGISTER FORM */}
+        <div
+          id="reg"
+          className={`w-full max-w-md transition-all duration-700 absolute ${
+            isRegister
+              ? "translate-y-0 opacity-100"
+              : "translate-y-full opacity-0"
+          }`}
+        >
+         <form
+            id="signup"
+            method="POST"
+            className="mx-auto w-full max-w-xl flex flex-col gap-6 bg-white/70 rounded-3xl shadow-lg backdrop-blur-md hover:shadow-emerald-200/50 transition p-8"
+          >
+            <h2 className="text-3xl font-bold text-green-700 mb-2 text-center">
+              Create Your Account
+            </h2>
 
-            <div className="first-line">
-              <div className={`input-control ${signupErrors.fname ? "error" : signup.fname ? "success" : ""}`}>
-                <label htmlFor="first_name">First Name</label>
+            {/* Name fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col">
+                <label htmlFor="fname" className="font-medium text-green-700">
+                  First Name
+                </label>
                 <input
                   type="text"
                   id="fname"
-                  name="fname"
-                  className="fname"
                   placeholder="First Name"
-                  value={signup.fname}
-                  onChange={handleChange(setSignup)}
-                  required
-                  aria-invalid={!!signupErrors.fname}
-                  aria-describedby="fname_error"
+                  className="border-2 border-green-300 rounded-md px-4 py-2 focus:outline-none focus:border-green-600 focus:shadow-md transition placeholder-green-700/50"
                 />
-                <div id="fname_error" className="error" aria-live="polite">
-                  {signupErrors.fname}
-                </div>
+                <span className="error text-red-500 text-sm mt-1"></span>
               </div>
 
-              <div className={`input-control ${signupErrors.lname ? "error" : signup.lname ? "success" : ""}`}>
-                <label htmlFor="second_name">Last Name</label>
+              <div className="flex flex-col">
+                <label htmlFor="lname" className="font-medium text-green-700">
+                  Last Name
+                </label>
                 <input
                   type="text"
                   id="lname"
-                  name="lname"
-                  className="lname"
                   placeholder="Last Name"
-                  value={signup.lname}
-                  onChange={handleChange(setSignup)}
-                  required
-                  aria-invalid={!!signupErrors.lname}
-                  aria-describedby="lname_error"
+                  className="border-2 border-green-300 rounded-md px-4 py-2 focus:outline-none focus:border-green-600 focus:shadow-md transition placeholder-green-700/50"
                 />
-                <div id="lname_error" className="error" aria-live="polite">
-                  {signupErrors.lname}
-                </div>
+                <span className="error text-red-500 text-sm mt-1"></span>
               </div>
             </div>
 
-            <div className={`input-control ${signupErrors.tel ? "error" : signup.tel ? "success" : ""}`}>
-              <label htmlFor="tel">Number</label>
-              <input
-                type="tel"
-                id="tel"
-                name="tel"
-                placeholder="Enter Number"
-                value={signup.tel}
-                onChange={handleChange(setSignup)}
-                required
-                pattern="\d{11}"
-                aria-invalid={!!signupErrors.tel}
-                aria-describedby="tel_error"
-              />
-              <div id="tel_error" className="error" aria-live="polite">
-                {signupErrors.tel}
+            {/* Contact fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col">
+                <label htmlFor="tel" className="font-medium text-green-700">
+                  Number
+                </label>
+                <input
+                  type="tel"
+                  id="tel"
+                  placeholder="Enter Number"
+                  className="border-2 border-green-300 rounded-md px-4 py-2 focus:outline-none focus:border-green-600 focus:shadow-md transition placeholder-green-700/50"
+                />
+                <span className="error text-red-500 text-sm mt-1"></span>
+              </div>
+
+              <div className="flex flex-col">
+                <label htmlFor="email_sig" className="font-medium text-green-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email_sig"
+                  placeholder="Enter Email"
+                  className="border-2 border-green-300 rounded-md px-4 py-2 focus:outline-none focus:border-green-600 focus:shadow-md transition placeholder-green-700/50"
+                />
+                <span className="error text-red-500 text-sm mt-1"></span>
               </div>
             </div>
 
-            <div className={`input-control ${signupErrors.email ? "error" : signup.email ? "success" : ""}`}>
-              <label htmlFor="email_sig">Email</label>
-              <input
-                type="email"
-                id="email_sig"
-                name="email"
-                placeholder="Enter Email"
-                value={signup.email}
-                onChange={handleChange(setSignup)}
-                required
-                aria-invalid={!!signupErrors.email}
-                aria-describedby="email_sig_error"
-              />
-              <div id="email_sig_error" className="error" aria-live="polite">
-                {signupErrors.email}
-              </div>
-            </div>
-
-            <div className={`input-control ${signupErrors.password ? "error" : signup.password ? "success" : ""}`}>
-              <label htmlFor="password_sig">Password</label>
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password_sig"
-                name="password"
-                placeholder="Enter Password"
-                value={signup.password}
-                onChange={handleChange(setSignup)}
-                required
-                minLength={PASSWORD_MIN}
-                aria-invalid={!!signupErrors.password}
-                aria-describedby="password_sig_error"
-              />
-              <div id="password_sig_error" className="error" aria-live="polite">
-                {signupErrors.password}
-              </div>
-            </div>
-
-            <div className="switch">
-              <label htmlFor="chk" className="sign_up-link">
-                Already have an account? Log-in!
+            {/* Password */}
+            <div className="flex flex-col">
+              <label htmlFor="password_sig" className="font-medium text-green-700">
+                Password
               </label>
+              <input
+                type="password"
+                id="password_sig"
+                placeholder="Enter Password"
+                className="border-2 border-green-300 rounded-md px-4 py-2 focus:outline-none focus:border-green-600 focus:shadow-md transition placeholder-green-700/50"
+              />
+              <span className="error text-red-500 text-sm mt-1"></span>
             </div>
 
-            <button type="submit" disabled={signupLoading}>
-              {signupLoading ? "Registering..." : "Register"}
+            {/* Buttons */}
+            <button
+              type="submit"
+              className="w-full py-3 rounded-md font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-400 hover:scale-105 hover:shadow-xl transition-all duration-300"
+            >
+              Register
             </button>
 
-            {signupServerError && <div className="server-error" role="alert">{signupServerError}</div>}
-
-            <div className="or_part">
-              <hr />
-              <h3>or</h3>
-              <hr />
+            <div className="flex items-center justify-center gap-2">
+              <hr className="w-32 border border-green-600" />
+              <h3 className="text-green-700">or</h3>
+              <hr className="w-32 border border-green-600" />
             </div>
 
-            <div className="google_btn">
-              <i className="fa-brands fa-google"></i>
-              <label>Register with your Google</label>
+            <button
+              type="button"
+              className="w-full flex items-center justify-center py-3 border border-green-700 text-green-700 rounded-md hover:bg-gradient-to-r hover:from-green-700 hover:to-green-500 hover:text-white transition"
+            >
+              <i className="fa-brands fa-google mr-2"></i> Register with Google
+            </button>
+
+            <div className="text-center text-green-700">
+              <label
+                htmlFor="chk"
+                className="cursor-pointer hover:text-green-900 hover:underline transition"
+                onClick={() => setIsRegister(false)}
+              >
+                Already have an account? Log in!
+              </label>
             </div>
           </form>
         </div>
@@ -391,4 +370,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default App;
