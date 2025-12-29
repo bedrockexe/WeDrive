@@ -30,7 +30,7 @@ app.use(
 );
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect('mongodb://localhost:27017/WeDrive')
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 
